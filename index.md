@@ -1,349 +1,49 @@
 
-# Jenkins部署笔记
+# 个人信息
+
+ - 卓灿东/男/1995
+ - 广东石油化工学院/本科（2013.09~2017.06）/电子信息科学与技术 
+ - 工作年限：2~3年
+ - 期望职位：C/C++ 软件工程师
 
 
+# 联系方式
 
-## Ant自动测试
+- 手机：15602916490
+- Email：svenkim_zhuo@qq.com 
 
-### 第一份可以用的build.xml
+# 专业技能
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="test1" default="test" basedir=".">
-	<property name="src_dir" value="/home/user/ant/"/>
-	<target name="build">
-		<mkdir dir="${src_dir}"/>
-		<echo message="create work dir succeed!"/>
-
-		<exec  executable="/home/user/test_bin" failonerror="true"/>
-		<!-- exec dir="/home/user/" executable="shell.sh" failonerror="true"/-->
-	</target>
-</project>
-
-```
-
-### 公司用的build.xml模板
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="test1" default="run" basedir=".">
-	<property name="src_dir" value="/home/share/"/>
-
-	<target name="run">
-		<antcall target="build" />
-	</target>
-	<target name="build">
-		<!--mkdir dir="./ppp" /-->
-		<echo message="start build succeed!"/>
-		<exec executable="${src_dir}/test/test_mcore" output="mcore.log" failonerror="true"/>
-		<exec executable="${src_dir}/test/test_mdps" failonerror="true"/>
-		<exec executable="svn" dir="${src_dir}/svnproject/" output="./svnproject/log.xml" failonerror="true">
-			<arg line="log -v -l 2 --xml  " />
-		</exec>
-	</target>	
-</project>	
-```
-
-###使用中的build.xml
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-
-<project name="auto" default="run" basedir=".">
-    
-    <property name="src_dir" value="/root/project/src/platforms/linux-x86/bin"/>
-    
-    <target name="run">
-        <antcall target="find_file" />
-        <antcall target="build" />
-    </target>
-
-     <target name="find_file">
-        <condition property="is.exist">
-            <and>
-                <available file="result.js" /> 
-            </and>
-        </condition>
-        <antcall target="delete_file" />
-    </target>
-
-    <target name="delete_file" if="is.exist">
-        <echo message="file exist!" />
-        <delete file="result.js" />
-    </target>
-    
-    <target name="build">
-        <echo message="start build!" />
-        <exec executable="${src_dir}/com.mining.app.test_mfsdk" failonerror="true" />
-        <!--copy todir="./" file="${src_dir}/com.mining.app.test_mfsdk" /-->
-        <!--copy todir="./" file="${src_dir}/result.js" /-->
-    </target>
-
-</project>
-```
+1. 熟悉C/C++语言编程，熟悉Linux系统下的开发、调试，掌握Shell、Makefile、gdb、交叉编译
+2. 熟悉常用数据结构（数组/链表/队列/栈）及常用算法
+3. 熟悉Socket网络编程技术，熟悉TCP、UDP、HTTP、FTP等常用网络协议，熟悉RTSP/RTP/RTMP等多媒体传输协议，会用 TcpDump/Wireshark 抓包，有嵌入式音视频处理经验
+4. 熟悉音视频相关概念，熟悉常见音视频数据的编码、转码、封装、传输技术，熟悉h264、h265、aac等编码和mp4封装格式，了解FFmpeg框架开发
+5. 了解Jenkins 自动化部署、测试、持续集成和Docker相关容器技术，掌握Svn/Git版本管理工具，对HTML/JavaScript有了解
 
 
+# 工作经历
 
-## 修改mtest框架，生成报告
+## 深圳市富视康实业发展有限公司 （ 2019年3月 ~ 至今 ）
 
-### 第一步：规范化
-尝试将mcore的单个测试函数改成mtest的规范型，规定好输入与输出。
+- 公司的主要业务是提供视频监控设备及相应服务，我们部门负责维护公司基础软件的sdk（包括Linux、Windows、MacOS、嵌入式设备、iOS、Android），我主要负责音视频传输、处理的相关内容。
+- 此外，我还负责本部门项目的管理，包括维护各平台下的构建脚本以及代码仓库的提交策略、分支，并使用Jenkins搭建代码审查、版本构建、测试、打包发布的流程。
 
-### 第二步：转json
+## 深圳市芯中芯科技有限公司 （ 2017年7月 ~ 2018年2月 ）
 
-将mtest中获取到的测试数据转化为json格式。
+- 我所在部门主要解决wifi音频方案，我跟随高级工程师完成wifi智能音箱开发的后段工程，主要工作为:阅读官方英文文档,协助其他人员解决功能接口bug；从各个方面对产品的功能进行多次测试，并将方案移植到新平台。
 
-#### 设计json数据框架
+# 项目经历
 
-```json
-[
-    {
-        "suite_name":"test_sample",
-        "test_case":[
-            {	"name":"add",
-                "result":"successful",
-                "time":10
-            },
-            {	"name":"sub",
-                "result":"failed",
-                "time":20
-            },
-            {
-                "name":"sum",
-                "result":"successful",
-                "time":0
-            },
-            .......
-        ],
-        "total":10,
-        "success":3,
-        "failure":7
-    },
-    {
-        "suite_name":"test_mcore",
-        "test_case":[
-			{
-				"name":"test mcore md5 ex enctypt",
-				"result":"success",
-				"time":0
-			},
-			{
-				"name":"test mcore base64",
-				"result":"success",
-				"time":0
-			}, 	   
-			{
-				"name":"test mcore mparams",
-				"result":"success",
-				"time":0
-			},
-            .......
-		],
-        "total":42,
-		"success":22,
-		"failure":11
-    },
-    .......
-]
-```
+### 视频监控项目的H.265 功能支持（2020.3 ~ 2020.11）
+公司的主营业务需要支持H.265功能，包括摄像机设备端、服务器、客户端之间的音视频传输。其他同事负责前期调研、简单实现初版demo并将部分应用到公司媒体框架，我负责后续的开发与协调工作，交付sdk并持续维护，使H.265业务新功能顺利上线。具体工作内容有 一：完成H.265新类型数据在多端平台之间的传输，涉及到的传输协议有RTSP、RTMP以及公司的私有传输协议，其中RTSP部分由我负责；二：客户端解码H.265视频流，本项目用到了开源的FFmpeg，以实现Android、iOS、Windows端正常播放H.265视频流及其他相关功能。
 
+### 鱼眼摄像机渲染图像黑边问题的处理（2019.12 ~ 2020.1）
+在手机客户端播放鱼眼摄像机画面时，摄像机原始画面被渲染为特定的鱼眼图像，由于摄像机型号不相同，画面容易出现未渲染完全的黑色边框 。原先以配置文件的方式调整渲染范围，我负责调研开发新方案后应用到本项目：使用了动态调整的方式，获取到一帧原始画面后，调用开源库OpenCV的接口（C++）自动适应渲染范围。其中涉及到OpenCV在Visual Studio/Android下的编译开发及安卓原生层JNI开发。新功能上线后安卓客户端基本未出现黑边问题，效果良好，且该项目可摒弃依赖配置文件的方式，利用新方案自动适配最佳渲染范围。
 
+### 优化声波传输配置摄像机wifi 的速度（2019.8 ~ 2019.12）
+该项目为摄像机wifi配置功能模块的一部分，通过手机播放特定编码后的声音序列使设备接收无线信息后连接wifi，其中配置速度仍有优化空间，需要由我找出问题并优化配置速度。前期我先熟悉声音配置的基本原理，包括wifi信息序列的加解密、声音的采样差异、解码纠错的实现；中后期进行大量的测试，根据测试结果寻找可优化点和并针对可优化点做出修改。修改后配置情况：获取无线信息的配置时间减少了30%，声音配置wifi成功率有所提高。
 
-#### 自己~~写的json数据~~
-
-```json
-{
-    NB:{
-        "one":"shenzhen",
-        "two":1980
-    },
-    XB:{
-        "one":"guangzhou",
-        "two":5588
-    }
-}  
-```
-
-#### 在mtest.c中~~取到的json数据~~
-
-```json
-{
-	"":{
-		"name":"add",
-		"result":"success",
-		"time":0
-		},
-	"":{
-		"name":"sub",
-		"result":"success",
-		"time":0
-		},
-	"":{
-		"name":"sum",
-		"result":"success",
-		"time":0
-		}
-}
-```
-
-#### 为了方便html调用，先将json数据文件转为js文件（即对象）---result.js
-
-```js
-var JSONObject= 
-[
-    {
-        "suite_name":"test_sample",
-        "test_case":[
-            {	"name":"add",
-                "result":"successful",
-                "time":10
-            },
-            {	"name":"sub",
-                "result":"failed",
-                "time":20
-            },
-            {
-                "name":"sum",
-                "result":"successful",
-                "time":0
-            }
-        ],
-        "total":10,
-        "success":3,
-        "failure":7
-    },
-    {
-        "suite_name":"test_mcore",
-        "test_case":[
-			{
-				"name":"test mcore md5 ex enctypt",
-				"result":"success",
-				"time":0
-			},
-			{
-				"name":"test mcore base64",
-				"result":"success",
-				"time":0
-			}, 	   
-			{
-				"name":"test mcore mparams",
-				"result":"success",
-				"time":0
-			}
-		],
-        "total":42,
-		"success":22,
-		"failure":11
-    },
-    "......."
-]
-```
-
-
-
-### 第三步：html获取json数据
-
-#### 调用js对象
-
-在html中加入script标签
-
-`<script src="result.js"> </script>`
-
-####根据json数组成员生成列表
-
-```javascript
-<script type="text/javascript" >
-    
-function addtr(start_line,name,result,time)
-{
-    var tradd=tab.insertRow(start_line);//插入1行
-        
-	//插入3列，给内容赋值并添加类名
-	var td1 =tradd.insertCell(0);
-    td1.innerHTML=name;
-	td1.classList.add("cls_name");
-    var td2 =tradd.insertCell(1);
-    td2.innerHTML=result;
-    td2.classList.add("cls_result");
-    var td3 =tradd.insertCell(2);
-    td3.innerHTML=time;
-    td3.classList.add("cls_time");
-}
-  
-var headerid = "header";
-for(var j=0;j<JSONObject.length-1;j++)
-{
-	var count = document.createElement("p");
-	var count_1 = document.createElement("div");
-	var count_2  = document.createElement("div");
-	var count_3  = document.createElement("div");
-	var count_4  = document.createElement("div");
-
-	//加一个新count块在上一个count元素后
-	document.getElementById(headerid).insertAdjacentElement('afterend',count);
-	count.appendChild(count_1);//加4个小模块跟随在本count块内
-	count.appendChild(count_2);
-	count.appendChild(count_3);
-	count.appendChild(count_4);
-
-	//给4个模块添加类名：class="cls_count"
-	count_1.classList.add("cls_count");
-	count_2.classList.add("cls_count");
-	count_3.classList.add("cls_count");
-	count_4.classList.add("cls_count");
-
-	//填入数据
-	count_1.innerHTML="测试模块:"+JSONObject[j].suite_name;
-	count_2.innerHTML="总个数:"+JSONObject[j].total;
-	count_3.innerHTML="成功个数:"+JSONObject[j].success;
-	count_4.innerHTML="失败个数:"+JSONObject[j].failure;
-
-	//添加表格
-	var tab = document.createElement("table");
-	count.insertAdjacentElement('beforeend',tab);//将表格加在本count块里，最后一个元素后面
-	
-	//加一行表头
-	addtr(0,"名称","结果","用时(ms)");
-	
-	tab.rows[0].cells[0].classList.add("clshead_name");
-	tab.rows[0].cells[1].classList.add("clshead_result");
-	tab.rows[0].cells[2].classList.add("clshead_time");	
-
-	//将每个测试函数的数据写入表格
-	for(var i=0;i<JSONObject[j].test_case.length;i++)
-		addtr(i+1,
-			JSONObject[j].test_case[i].name,
-			JSONObject[j].test_case[i].result,
-			JSONObject[j].test_case[i].time);
-	
-	//为了让下个测试套能找到上一个测试套的id，从而在其下方生成数据
-	headerid = "count"+(j);
-	count.id = headerid;
-	console.log(count.id);
-
-}
-
-</script>
-```
-
-![测试报告初步模板](file:///C:/Users/Admin/Pictures/测试报告demo.png)
-
-
-
-### 第四步：Ant调用build.xml
-
-#### 默认规范
-
-将report.html、build.xml都放在一个指定目录
-
-> ~/workspace/jobs_name/html/
-
-#### 自动运行、调用
-
-Ant按照build.xml的命令自动运行后，在此目录下生成result.js。
-
-于是report.html调用当前目录下的result.js，便能读取出数据并生成表格。
-
-
-
-
+---
+# 致谢
+感谢您花时间阅读我的简历，期待能有机会和您共事。
+      
